@@ -1,0 +1,28 @@
+name: Run pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements.txt
+      - name: Build dataset
+        run: python scripts/generate_data.py
+      - name: Run analysis
+        run: python scripts/run_analysis.py
+      - name: Render charts
+        run: python scripts/make_charts.py
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: funnel-results
+          path: results/
